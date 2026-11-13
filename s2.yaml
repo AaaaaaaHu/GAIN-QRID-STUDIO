@@ -1,0 +1,149 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e12]:
+      - heading "GIAN-QRID-STUDIO" [level=1] [ref=e13]
+      - paragraph [ref=e14]: 关键词生成唯一 ID · 实时二维码 · 本地留档
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - text: 本地已存
+        - generic [ref=e18]: "0"
+        - text: 条
+      - button "📁 数据目录" [ref=e19] [cursor=pointer]
+  - main [ref=e20]:
+    - complementary [ref=e21]:
+      - generic [ref=e22]:
+        - heading "生成配置" [level=2] [ref=e23]
+        - generic [ref=e24]: 不重复
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - text: 关键词
+            - generic [ref=e28]: 每行一个，也支持逗号 / 顿号分隔
+          - textbox "关键词 每行一个，也支持逗号 / 顿号分隔" [ref=e29]:
+            - /placeholder: "例如：春季新品\n设备A-001\n张三"
+          - generic [ref=e30]: 留空则生成不带关键词的 ID
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e34]: 每个关键词生成
+            - spinbutton "每个关键词生成" [ref=e35]: "1"
+          - generic [ref=e36]:
+            - generic [ref=e37]: 备注（可选）
+            - textbox "备注（可选）" [ref=e38]:
+              - /placeholder: 批次 / 用途
+        - group [ref=e39]:
+          - generic "ID 组成规则 ▾" [ref=e40] [cursor=pointer]
+          - generic [ref=e41]:
+            - generic [ref=e42]:
+              - generic [ref=e43]: 固定前缀
+              - textbox "固定前缀" [ref=e44]:
+                - /placeholder: ID
+                - text: ID
+            - generic [ref=e45]:
+              - generic [ref=e46]: 固定后缀
+              - textbox "固定后缀" [ref=e47]:
+                - /placeholder: 可留空
+            - generic [ref=e48]:
+              - generic [ref=e49]: 关键词处理
+              - combobox "关键词处理" [ref=e50]:
+                - option "转拼音首字母（张三 → ZS）" [selected]
+                - option "转全拼（张三 → ZHANGSAN）"
+                - option "保留原文"
+                - option "不写入 ID"
+            - generic [ref=e51]:
+              - generic [ref=e52]: 关键词段最长
+              - spinbutton "关键词段最长" [ref=e53]: "8"
+            - generic [ref=e54]:
+              - generic [ref=e55]: 分隔符
+              - combobox "分隔符" [ref=e56]:
+                - option "短横线 -" [selected]
+                - option "无"
+                - option "下划线 _"
+                - option "点 ."
+            - generic [ref=e58] [cursor=pointer]:
+              - checkbox "关键词段转为大写" [checked] [ref=e59]
+              - text: 关键词段转为大写
+            - generic [ref=e61] [cursor=pointer]:
+              - checkbox "写入日期" [checked] [ref=e62]
+              - text: 写入日期
+            - combobox [ref=e64]:
+              - option "20260101" [selected]
+              - option "260101"
+              - option "202601"
+              - option "2026"
+            - generic [ref=e65]:
+              - generic [ref=e66]: 序号位数
+              - spinbutton "序号位数" [ref=e67]: "4"
+            - generic [ref=e68]:
+              - generic [ref=e69]: 随机位长度
+              - spinbutton "随机位长度" [ref=e70]: "4"
+            - generic [ref=e71]:
+              - generic [ref=e72]: 随机字符集
+              - combobox "随机字符集" [ref=e73]:
+                - option "大写字母 + 数字（无 I/O）" [selected]
+                - option "纯数字"
+                - option "大小写 + 数字"
+                - option "小写字母"
+                - option "十六进制"
+            - generic [ref=e75] [cursor=pointer]:
+              - checkbox "追加校验位" [checked] [ref=e76]
+              - text: 追加校验位
+          - generic [ref=e77]:
+            - generic [ref=e78]: 规则示例
+            - code [ref=e79]: ID-CPA-20261113-0001-BBDQ-4
+        - group [ref=e80]:
+          - generic "二维码设置 ▾" [ref=e81] [cursor=pointer]
+          - option "L · 7%"
+          - option "M · 15%" [selected]
+          - option "Q · 25%"
+          - option "H · 30%"
+      - generic [ref=e82]:
+        - button "生成 ID + 二维码（1）" [ref=e83] [cursor=pointer]
+        - paragraph [ref=e84]: Ctrl / ⌘ + Enter 快速生成 · 生成即写入本地并自动去重
+    - generic [ref=e85]:
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]: 当前二维码
+          - generic [ref=e89]: 内容变更后实时重绘
+        - generic [ref=e90]:
+          - generic [ref=e91]: ▦
+          - paragraph [ref=e92]: 左侧输入关键词后点击生成
+          - paragraph [ref=e93]: 生成的 ID 与二维码会自动保存到本地
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]: 导出范围
+          - combobox [ref=e97]:
+            - option "全部记录" [selected]
+            - option "仅选中的记录"
+            - option "仅当前预览"
+          - generic [ref=e98]: 全部 0 条
+        - generic [ref=e99]:
+          - button "CSV" [disabled] [ref=e100]
+          - button "JSON" [disabled] [ref=e101]
+          - button "TXT" [disabled] [ref=e102]
+          - button "当前 PNG" [ref=e103] [cursor=pointer]
+          - button "一键导出 ID + 二维码" [disabled] [ref=e104]
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - heading "生成记录" [level=2] [ref=e108]
+            - generic [ref=e109]: 0 条
+          - generic [ref=e110]:
+            - searchbox "搜索 ID / 关键词 / 备注" [ref=e111]
+            - button "全选" [disabled] [ref=e112]
+            - button "清除选择" [disabled] [ref=e113]
+            - button "清空记录" [disabled] [ref=e114]
+        - generic [ref=e115]:
+          - table [ref=e116]:
+            - rowgroup [ref=e117]:
+              - row [ref=e118]:
+                - columnheader [ref=e119]:
+                  - checkbox [disabled] [ref=e120]
+                - columnheader "ID" [ref=e121]
+                - columnheader "关键词" [ref=e122]
+                - columnheader "二维码内容" [ref=e123]
+                - columnheader "生成时间" [ref=e124]
+                - columnheader [ref=e125]
+            - rowgroup
+          - generic [ref=e126]:
+            - generic [ref=e127]: ▤
+            - paragraph [ref=e128]: 还没有生成记录
