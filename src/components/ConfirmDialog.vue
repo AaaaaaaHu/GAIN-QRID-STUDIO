@@ -85,7 +85,7 @@ function onMaskClick(e: MouseEvent) {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(17, 24, 45, .48);
+  background: var(--mask-strong);
   backdrop-filter: blur(2px);
 }
 
@@ -95,7 +95,7 @@ function onMaskClick(e: MouseEvent) {
   padding: 18px 20px 16px;
   background: var(--surface);
   border-radius: 14px;
-  box-shadow: 0 22px 60px rgba(17, 24, 45, .32);
+  box-shadow: var(--dialog-shadow-sm);
 }
 
 .head {
@@ -124,7 +124,7 @@ function onMaskClick(e: MouseEvent) {
   color: var(--brand);
 
   &.danger {
-    background: #fdecec;
+    background: var(--surface-err-strong);
     color: var(--err);
   }
 }
@@ -164,7 +164,7 @@ function onMaskClick(e: MouseEvent) {
 :deep(.btn-danger-solid) {
   background: var(--err);
   border-color: var(--err);
-  color: #fff;
+  color: var(--on-brand);
 
   &:hover { filter: brightness(1.07); }
 }

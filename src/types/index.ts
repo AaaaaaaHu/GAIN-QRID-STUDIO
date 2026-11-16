@@ -30,6 +30,8 @@ export const DEFAULT_LOGO: LogoConfig = {
 /** ID 组成规则，全部可持久化 */
 export interface IdRule {
   prefix: string
+  /** 城市编码（行政区划代码），留空则不写入 ID，位置在固定前缀之后 */
+  cityCode: string
   keywordMode: KeywordMode
   keywordMaxLength: number
   keywordUppercase: boolean
@@ -73,6 +75,7 @@ export interface IdRecord {
 export const DEFAULT_CONFIG: AppConfig = {
   id: {
     prefix: 'ID',
+    cityCode: '',
     keywordMode: 'initials',
     keywordMaxLength: 8,
     keywordUppercase: true,

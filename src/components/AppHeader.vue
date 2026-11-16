@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 16px;
   padding: 12px 20px;
-  background: rgba(255, 255, 255, .82);
+  background: var(--header-bg);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
@@ -124,8 +124,8 @@ onBeforeUnmount(() => {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #5b52f0, #2f6bff);
-  box-shadow: 0 5px 14px rgba(79, 70, 229, .28);
+  background: var(--brand-gradient);
+  box-shadow: 0 5px 14px var(--brand-shadow);
 }
 
 .titles {
@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
   height: 6px;
   border-radius: 50%;
   background: var(--ok);
-  box-shadow: 0 0 0 3px rgba(15, 157, 110, .14);
+  box-shadow: 0 0 0 3px var(--ok-ring);
 }
 
 .settings-btn { gap: 5px; }

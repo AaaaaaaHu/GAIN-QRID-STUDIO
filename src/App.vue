@@ -9,7 +9,7 @@ import SettingsModal from '@/components/SettingsModal.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { useStudio } from '@/composables/useStudio'
 
-const { init, toast, settingsOpen } = useStudio()
+const { init, toast } = useStudio()
 
 onMounted(() => { void init() })
 </script>
@@ -31,7 +31,7 @@ onMounted(() => { void init() })
       <div v-if="toast" class="toast" :class="toast.kind">{{ toast.text }}</div>
     </Transition>
 
-    <SettingsModal :visible="settingsOpen" />
+    <SettingsModal />
     <ConfirmDialog />
   </div>
 </template>
@@ -43,8 +43,8 @@ onMounted(() => { void init() })
   height: 100vh;
   overflow: hidden;
   background:
-    radial-gradient(1200px 500px at 90% -10%, #eef1ff 0%, transparent 60%),
-    radial-gradient(900px 400px at -10% 110%, #e9f6ff 0%, transparent 55%),
+    radial-gradient(1200px 500px at 90% -10%, var(--bg-glow-1) 0%, transparent 60%),
+    radial-gradient(900px 400px at -10% 110%, var(--bg-glow-2) 0%, transparent 55%),
     var(--bg);
 }
 
@@ -74,18 +74,18 @@ onMounted(() => { void init() })
   max-width: min(560px, calc(100vw - 48px));
   padding: 10px 16px;
   border-radius: 10px;
-  background: #1b2559;
-  color: #fff;
+  background: var(--toast-bg);
+  color: var(--on-brand);
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(27, 37, 89, .24);
+  box-shadow: var(--dialog-shadow);
   word-break: break-all;
   pointer-events: none;
 
-  &.ok { background: #123f31; }
-  &.warn { background: #7a4a08; }
-  &.err { background: #7f1d1d; }
+  &.ok { background: var(--toast-ok); }
+  &.warn { background: var(--toast-warn); }
+  &.err { background: var(--toast-err); }
 }
 
 .toast-enter-active, .toast-leave-active { transition: opacity .2s ease, transform .2s ease; }

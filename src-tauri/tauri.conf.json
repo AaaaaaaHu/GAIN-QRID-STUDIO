@@ -31,6 +31,18 @@
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "wix": {
+        "language": {
+          "zh-CN": {
+            "localePath": "installer/zh-CN.wxl"
+          }
+        }
+      },
+      "nsis": {
+        "languages": ["SimpChinese"]
+      }
+    }
   }
 }

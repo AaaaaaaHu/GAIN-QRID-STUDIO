@@ -1,0 +1,203 @@
+/* 主题变量：语义色（浅/深） + 强调色预设（6 套）。
+   组件样式一律引用这里的变量，不写死颜色。 */
+:root {
+  color-scheme: light;
+
+  /* 外观基础语义色 */
+  --bg: #f3f6fc;
+  --bg-glow-1: #eef1ff;
+  --bg-glow-2: #e9f6ff;
+  --surface: #ffffff;
+  --surface-soft: #f8faff;
+  --surface-soft-2: rgba(248, 250, 255, .288);
+  --surface-raised: #ffffff;
+  --surface-code: #f1f4fb;
+  --surface-checker: #f6f8fd;
+  --surface-checker-base: #ffffff;
+  --surface-warn: #fff9ec;
+  --surface-warn-hover: #fff3d6;
+  --surface-err: #fff1f1;
+  --surface-err-strong: #fdecec;
+  --surface-preview: #f1f3ff;
+  --surface-preview-2: #eef6ff;
+
+  --border: #e4e9f3;
+  --border-strong: #d3dbeb;
+  --border-row: #f0f3fa;
+  --border-warn: #f0c67a;
+  --border-info: #dfe4fb;
+
+  /* 文字颜色 */
+  --ink: #1b2559;
+  --ink-2: #4a5578;
+  --ink-3: #8792ac;
+  --ink-4: #aab3c8;
+  --ink-warn: #a16207;
+  --ink-blocked: #ccd4e6;
+  --ink-sample: #6f74a3;
+  --on-brand: #ffffff;
+
+  --ok: #0f9d6e;
+  --warn: #d97706;
+  --err: #dc2626;
+
+  --shadow: 0 2px 6px rgba(27, 37, 89, .04), 0 12px 32px rgba(27, 37, 89, .06);
+  --shadow-raised: 0 1px 4px rgba(27, 37, 89, .12);
+  --shadow-dropdown: 0 14px 34px rgba(27, 37, 89, .16), 0 2px 6px rgba(27, 37, 89, .06);
+  --dialog-shadow: 0 24px 64px rgba(17, 24, 45, .3);
+  --dialog-shadow-sm: 0 22px 60px rgba(17, 24, 45, .32);
+  --mask: rgba(17, 24, 45, .42);
+  --mask-strong: rgba(17, 24, 45, .48);
+
+  --scrollbar: #cfd7e8;
+  --scrollbar-hover: #b6c2dc;
+  --scrollbar-soft: #ccd4e6;
+  --header-bg: rgba(255, 255, 255, .82);
+  --tab-hover: rgba(255, 255, 255, .75);
+  --tab-desc-on: #9298c2;
+  --tag-warn-bg: #fff4e5;
+  --tag-warn-ink: #b45309;
+  --toast-bg: #1b2559;
+  --toast-ok: #123f31;
+  --toast-warn: #7a4a08;
+  --toast-err: #7f1d1d;
+
+  --sample-bg-1: #f4f5ff;
+  --sample-bg-2: #eef0ff;
+  --id-bg-1: #f1f3ff;
+  --id-bg-2: #eef6ff;
+  --row-hover: #f8faff;
+  --row-active: #eef2ff;
+  --row-picked: #f3f6ff;
+  --blocked-bg: #f7f8fc;
+  --select-arrow: #8792ac;
+  --select-hover-border: #c3cbe4;
+
+  --radius: 14px;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+
+  /* 强调色：默认靛蓝，下面按 data-accent 覆盖 */
+  --brand: #4f46e5;
+  --brand-2: #2f6bff;
+  --brand-3: #5b52f0;
+  --brand-4: #2059ea;
+  --brand-ink: #ffffff;
+
+  /* 由强调色与当前表面色实时推导，浅/深模式自动适配 */
+  --brand-soft: color-mix(in srgb, var(--brand) 9%, var(--surface));
+  --brand-soft-strong: color-mix(in srgb, var(--brand) 18%, var(--surface));
+  --brand-ring: color-mix(in srgb, var(--brand) 16%, transparent);
+  --brand-line: color-mix(in srgb, var(--brand) 18%, transparent);
+  --brand-shadow: color-mix(in srgb, var(--brand) 28%, transparent);
+  --brand-gradient: linear-gradient(135deg, var(--brand-3), var(--brand-2));
+  --brand-gradient-hover: linear-gradient(135deg, var(--brand-3), var(--brand-4));
+  --ok-ring: color-mix(in srgb, var(--ok) 18%, transparent);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0b1120;
+  --bg-glow-1: #182046;
+  --bg-glow-2: #102b3c;
+  --surface: #151d30;
+  --surface-soft: #1b243b;
+  --surface-soft-2: rgba(255, 255, 255, .04);
+  --surface-raised: #222d46;
+  --surface-code: #1d2941;
+  --surface-checker: #1c2740;
+  --surface-checker-base: #151d30;
+  --surface-warn: #3a2c14;
+  --surface-warn-hover: #4a3818;
+  --surface-err: #3a1c25;
+  --surface-err-strong: #48212b;
+  --surface-preview: #202b4a;
+  --surface-preview-2: #172c3f;
+
+  --border: #28334c;
+  --border-strong: #3a4765;
+  --border-row: #212b41;
+  --border-warn: #6b5429;
+  --border-info: #2c3a5e;
+
+  --ink: #e8edfb;
+  --ink-2: #b6c2dc;
+  --ink-3: #8895b3;
+  --ink-4: #66738f;
+  --ink-warn: #fbbf24;
+  --ink-blocked: #56617c;
+  --ink-sample: #9aa6c6;
+  --on-brand: #ffffff;
+
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --err: #f87171;
+
+  --shadow: 0 2px 6px rgba(0, 0, 0, .22), 0 12px 32px rgba(0, 0, 0, .3);
+  --shadow-raised: 0 1px 4px rgba(0, 0, 0, .42);
+  --shadow-dropdown: 0 14px 34px rgba(0, 0, 0, .48), 0 2px 6px rgba(0, 0, 0, .3);
+  --dialog-shadow: 0 24px 64px rgba(0, 0, 0, .58);
+  --dialog-shadow-sm: 0 22px 60px rgba(0, 0, 0, .6);
+  --mask: rgba(3, 7, 17, .66);
+  --mask-strong: rgba(3, 7, 17, .72);
+
+  --scrollbar: #3a4765;
+  --scrollbar-hover: #4d5c80;
+  --scrollbar-soft: #3a4765;
+  --header-bg: rgba(21, 29, 48, .84);
+  --tab-hover: rgba(255, 255, 255, .06);
+  --tab-desc-on: #8f9cc0;
+  --tag-warn-bg: #453318;
+  --tag-warn-ink: #fbbf24;
+  --toast-bg: #26314c;
+  --toast-ok: #0d3b2c;
+  --toast-warn: #5a3708;
+  --toast-err: #5f1d24;
+
+  --sample-bg-1: #212b4b;
+  --sample-bg-2: #1b2942;
+  --id-bg-1: #222d4c;
+  --id-bg-2: #1a2c42;
+  --row-hover: #1d2740;
+  --row-active: #263056;
+  --row-picked: #202b48;
+  --blocked-bg: #1a2337;
+  --select-arrow: #8895b3;
+  --select-hover-border: #4a5878;
+}
+
+/* 6 套强调色。只换这 5 个基准色，衍生色由 color-mix 自动计算 */
+:root[data-accent="indigo"]  { --brand: #4f46e5; --brand-2: #2f6bff; --brand-3: #5b52f0; --brand-4: #2059ea; }
+:root[data-accent="ocean"]   { --brand: #0284c7; --brand-2: #2563eb; --brand-3: #0ea5e9; --brand-4: #1d4fd7; }
+:root[data-accent="forest"]  { --brand: #059669; --brand-2: #0d9488; --brand-3: #10b981; --brand-4: #0b7a70; }
+:root[data-accent="amber"]   { --brand: #d97706; --brand-2: #ea580c; --brand-3: #f59e0b; --brand-4: #c2410c; }
+:root[data-accent="rose"]    { --brand: #e11d48; --brand-2: #db2777; --brand-3: #fb7185; --brand-4: #be185d; }
+:root[data-accent="graphite"]{ --brand: #64748b; --brand-2: #475569; --brand-3: #7c8aa3; --brand-4: #334155; }
+
+/* 深色下把强调色提亮一档，保证文字/图标对比度 */
+:root[data-theme="dark"][data-accent="indigo"]  { --brand: #818cf8; --brand-2: #60a5fa; --brand-3: #8b83ff; --brand-4: #4c8dff; }
+:root[data-theme="dark"][data-accent="ocean"]   { --brand: #38bdf8; --brand-2: #60a5fa; --brand-3: #4cc9f5; --brand-4: #3b82f6; }
+:root[data-theme="dark"][data-accent="forest"]  { --brand: #34d399; --brand-2: #2dd4bf; --brand-3: #48e0a8; --brand-4: #16a37f; }
+:root[data-theme="dark"][data-accent="amber"]   { --brand: #fbbf24; --brand-2: #fb923c; --brand-3: #fcd34d; --brand-4: #f97316; }
+:root[data-theme="dark"][data-accent="rose"]    { --brand: #fb7185; --brand-2: #f472b6; --brand-3: #fda4af; --brand-4: #e11d48; }
+:root[data-theme="dark"][data-accent="graphite"]{ --brand: #94a3b8; --brand-2: #64748b; --brand-3: #aab6ca; --brand-4: #526078; }
+
+/* 减少界面动效 */
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  transition-duration: .01ms !important;
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+/* 跟随系统偏好但用户未开启减少动效时的兜底 */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-motion="full"] *,
+  :root[data-motion="full"] *::before,
+  :root[data-motion="full"] *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

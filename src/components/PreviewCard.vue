@@ -93,9 +93,9 @@ const createdText = computed(() =>
   border: 1px solid var(--border);
   border-radius: 12px;
   background:
-    linear-gradient(45deg, #f6f8fd 25%, transparent 25%) -8px 0/16px 16px,
-    linear-gradient(-45deg, #f6f8fd 25%, transparent 25%) -8px 0/16px 16px,
-    #fff;
+    linear-gradient(45deg, var(--surface-checker) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, var(--surface-checker) 25%, transparent 25%) -8px 0/16px 16px,
+    var(--surface-checker-base);
 
   img {
     width: 100%;
@@ -116,8 +116,8 @@ const createdText = computed(() =>
   gap: 8px;
   padding: 9px 11px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #f1f3ff, #eef6ff);
-  border: 1px solid #dfe4fb;
+  background: linear-gradient(135deg, var(--id-bg-1), var(--id-bg-2));
+  border: 1px solid var(--border-info);
 }
 
 .id-label {

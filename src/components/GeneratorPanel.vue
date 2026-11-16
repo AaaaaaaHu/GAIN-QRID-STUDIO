@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useStudio, buildGeneratePlan, type CountMode } from '@/composables/useStudio'
 import { keywordSlug, parseKeywords, previewId, renderQrContent } from '@/utils/id'
+import { regionOptions, normalizeCityCode } from '@/utils/city'
 import { normalizeLogo } from '@/utils/qrcode'
 import { isTauri } from '@/utils/platform'
 import AppSelect from '@/components/AppSelect.vue'
@@ -57,6 +58,22 @@ const note = ref('')
 const submitting = ref(false)
 
 const presets = [10, 50, 100, 200]
+
+/** 城市下拉：省 / 市 / 区县三级，可搜索（名称、代码、拼音、首字母） */
+const cityOptions = regionOptions()
+
+function applyCityCode(code: string) {
+  config.value.id.cityCode = normalizeCityCode(code)
+}
+
+/** 只保留字母 / 数字 / _ / -，避免非法字符进入 ID */
+function onCityInput(event: Event) {
+  const el = event.target as HTMLInputElement
+  const next = normalizeCityCode(el.value)
+  config.value.id.cityCode = next
+  if (el.value !== next) el.value = next
+}
+
 const maxCount = computed(() => (countMode.value === 'total' ? 500 : 200))
 const safeCount = computed(() =>
   Math.max(1, Math.min(maxCount.value, Math.floor(Number(count.value)) || 1))
@@ -73,15 +90,22 @@ const planHint = computed(() => {
   return items.length > 4 ? `${head} …` : head
 })
 
-const sampleId = computed(() => {
-  const kw = keywords.value[0] ?? '产品A'
-  return previewId(config.value.id, keywordSlug(kw, config.value.id), nextSequence.value)
-})
+/**
+ * 示例只反映当前输入：没填关键词就不带关键词段，不塞占位词。
+ * 否则会出现「关键词留空却预览出 CPA 这类段」的错觉。
+ */
+const firstKeyword = computed(() => keywords.value[0] ?? '')
+const sampleSlug = computed(() =>
+  firstKeyword.value ? keywordSlug(firstKeyword.value, config.value.id) : ''
+)
+
+const sampleId = computed(() => previewId(config.value.id, sampleSlug.value, nextSequence.value))
 
 const sampleContent = computed(() => renderQrContent(config.value.qr.contentTemplate, {
   id: sampleId.value,
-  keyword: keywords.value[0] ?? '产品A',
-  slug: keywordSlug(keywords.value[0] ?? '产品A', config.value.id),
+  keyword: firstKeyword.value,
+  slug: sampleSlug.value,
+  city: config.value.id.cityCode,
   sequence: nextSequence.value,
   date: new Date(),
   prefix: config.value.id.prefix
@@ -239,68 +263,97 @@ function forceHighEcc() {
       <details class="group" open>
         <summary>ID 组成规则</summary>
 
-        <div class="grid-2">
-          <div class="field">
-            <label for="prefix">固定前缀</label>
-            <input id="prefix" v-model="config.id.prefix" class="input" type="text" placeholder="ID" />
-          </div>
-          <div class="field">
-            <label for="suffix">固定后缀</label>
-            <input id="suffix" v-model="config.id.suffix" class="input" type="text" placeholder="可留空" />
+        <div class="rule-stack">
+          <div class="grid-2">
+            <div class="field">
+              <label for="prefix">固定前缀</label>
+              <input id="prefix" v-model="config.id.prefix" class="input" type="text" placeholder="ID" />
+            </div>
+            <div class="field">
+              <label for="suffix">固定后缀</label>
+              <input id="suffix" v-model="config.id.suffix" class="input" type="text" placeholder="可留空" />
+            </div>
+
+            <div class="field span-2">
+              <label for="city">城市编码
+                <span class="sub">悬停省 / 市可向右展开下一级，也可直接搜索名称、代码、拼音；留空则不写入，位于固定前缀之后</span>
+              </label>
+              <div class="city-row">
+                <input id="city" class="input mono" type="text" maxlength="8" placeholder="可留空，如 310000"
+                  :value="config.id.cityCode" @input="onCityInput" />
+                <AppSelect class="city-picker" size="md" searchable cascade :column-width="164"
+                  search-placeholder="搜索城市 / 区县"
+                  :result-limit="400" :panel-width="304"
+                  empty-text="没有匹配项，可直接输入代码"
+                  :model-value="config.id.cityCode" :options="cityOptions"
+                  :placeholder="config.id.cityCode || '选择城市'" @update:model-value="applyCityCode" />
+              </div>
+            </div>
           </div>
 
-          <div class="field span-2">
-            <label for="kwmode">关键词处理</label>
-            <AppSelect id="kwmode" v-model="config.id.keywordMode" :options="keywordModeOptions" />
+          <!-- 关键词段字段多且自成一套规则，单独收成子模块，避免与其它字段混在一起 -->
+          <div class="sub-card">
+            <div class="sub-head">
+              <h3>关键词段</h3>
+              <p>关键词怎么写入、段与段之间用什么连接</p>
+            </div>
+
+            <div class="grid-2">
+              <div class="field span-2">
+                <label for="kwmode">处理方式</label>
+                <AppSelect id="kwmode" v-model="config.id.keywordMode" :options="keywordModeOptions" />
+              </div>
+
+              <div class="field">
+                <label for="kwlen">关键词段最长</label>
+                <input id="kwlen" v-model.number="config.id.keywordMaxLength" class="input" type="number" min="1"
+                  max="32" />
+              </div>
+              <div class="field">
+                <label for="sep">分隔符</label>
+                <AppSelect id="sep" v-model="config.id.separator" :options="separatorOptions" />
+              </div>
+
+              <div class="field span-2">
+                <label class="checkbox-row">
+                  <input v-model="config.id.keywordUppercase" type="checkbox" />
+                  关键词段转为大写
+                </label>
+              </div>
+            </div>
           </div>
 
-          <div class="field">
-            <label for="kwlen">关键词段最长</label>
-            <input id="kwlen" v-model.number="config.id.keywordMaxLength" class="input" type="number" min="1"
-              max="32" />
-          </div>
-          <div class="field">
-            <label for="sep">分隔符</label>
-            <AppSelect id="sep" v-model="config.id.separator" :options="separatorOptions" />
-          </div>
+          <div class="grid-2">
+            <div class="field span-2">
+              <label class="checkbox-row">
+                <input v-model="config.id.includeDate" type="checkbox" />
+                写入日期
+              </label>
+              <AppSelect v-model="config.id.dateFormat" :options="dateFormatOptions" :disabled="!config.id.includeDate" />
+            </div>
 
-          <div class="field span-2">
-            <label class="checkbox-row">
-              <input v-model="config.id.keywordUppercase" type="checkbox" />
-              关键词段转为大写
-            </label>
-          </div>
+            <div class="field">
+              <label for="seqlen">序号位数</label>
+              <input id="seqlen" v-model.number="config.id.sequenceLength" class="input" type="number" min="0" max="10" />
+            </div>
+            <div class="field">
+              <label for="randlen">随机位长度</label>
+              <input id="randlen" v-model.number="config.id.randomLength" class="input" type="number" min="0" max="16" />
+            </div>
 
-          <div class="field span-2">
-            <label class="checkbox-row">
-              <input v-model="config.id.includeDate" type="checkbox" />
-              写入日期
-            </label>
-            <AppSelect v-model="config.id.dateFormat" :options="dateFormatOptions" :disabled="!config.id.includeDate" />
-          </div>
+            <div class="field span-2">
+              <label for="charset">随机字符集</label>
+              <AppSelect id="charset" v-model="config.id.charset" :options="charsetOptions" />
+            </div>
 
-          <div class="field">
-            <label for="seqlen">序号位数</label>
-            <input id="seqlen" v-model.number="config.id.sequenceLength" class="input" type="number" min="0" max="10" />
-          </div>
-          <div class="field">
-            <label for="randlen">随机位长度</label>
-            <input id="randlen" v-model.number="config.id.randomLength" class="input" type="number" min="0" max="16" />
-          </div>
-
-          <div class="field span-2">
-            <label for="charset">随机字符集</label>
-            <AppSelect id="charset" v-model="config.id.charset" :options="charsetOptions" />
-          </div>
-          <div class="field">
-            <label class="checkbox-row">
-              <input v-model="config.id.checksum" type="checkbox" />
-              追加校验位
-            </label>
+            <div class="field span-2">
+              <label class="checkbox-row">
+                <input v-model="config.id.checksum" type="checkbox" />
+                追加校验位
+              </label>
+            </div>
           </div>
         </div>
-
-
       </details>
 
       <details class="group">
@@ -310,7 +363,7 @@ function forceHighEcc() {
           <label for="tpl">二维码内容模板</label>
           <input id="tpl" v-model="config.qr.contentTemplate" class="input mono" type="text" />
           <div class="hint-line">
-            占位符：<code>{id}</code> <code>{keyword}</code> <code>{slug}</code> <code>{date}</code> <code>{sequence}</code>
+            占位符：<code>{id}</code> <code>{keyword}</code> <code>{slug}</code> <code>{city}</code> <code>{date}</code> <code>{sequence}</code>
           </div>
         </div>
 
@@ -432,8 +485,9 @@ function forceHighEcc() {
 
   h2 {
     margin: 0;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 700;
+    letter-spacing: .3px;
   }
 }
 
@@ -477,11 +531,74 @@ function forceHighEcc() {
   grid-column: span 2;
 }
 
+/* 组内纵向堆叠：普通字段网格与关键词子模块之间保持统一间距 */
+.rule-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 模块内的子卡片：用淡底 + 描边圈出相关字段，标题比二级小、比字段标签重 */
+.sub-card {
+  padding: 10px 10px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.sub-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+
+  h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.45;
+    color: var(--ink-3);
+  }
+}
+
+/* 卡片内的下拉与输入框统一 32px 高，避免同一行两栏底部错位 */
+.sub-card :deep(.app-select .trigger) {
+  height: 32px;
+}
+
+.city-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.city-picker {
+  flex: 0 0 108px;
+  width: 108px;
+
+  :deep(.trigger) {
+    height: 32px;
+  }
+}
+
 .field>label .sub {
   display: block;
+  margin-top: 2px;
   font-weight: 500;
+  letter-spacing: 0;
   color: var(--ink-3);
-  font-size: 10.5px;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .kw-meta {
@@ -519,9 +636,9 @@ function forceHighEcc() {
     transition: all .15s;
 
     &.on {
-      background: #fff;
+      background: var(--surface-raised);
       color: var(--brand);
-      box-shadow: 0 1px 3px rgba(27, 37, 89, .12);
+      box-shadow: var(--shadow-raised);
     }
   }
 }
@@ -579,10 +696,10 @@ function forceHighEcc() {
   margin-top: 18px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: linear-gradient(180deg, #f4f5ff, #eef0ff);
-  border: 1px solid rgba(79, 70, 229, .14);
+  background: linear-gradient(180deg, var(--sample-bg-1), var(--sample-bg-2));
+  border: 1px solid var(--brand-line);
   font-size: 10.5px;
-  color: #6f74a3;
+  color: var(--ink-sample);
 
   span {
     display: block;
@@ -597,8 +714,8 @@ function forceHighEcc() {
     display: block;
     padding: 6px 9px;
     border-radius: 6px;
-    background: #fff;
-    border: 1px solid rgba(79, 70, 229, .1);
+    background: var(--surface);
+    border: 1px solid var(--brand-line);
     color: var(--brand);
     font-size: 11px;
     font-weight: 600;
@@ -613,7 +730,13 @@ function forceHighEcc() {
 }
 
 .hint-line {
-  font-size: 10.5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+  font-size: 10px;
+  line-height: 1.6;
   color: var(--ink-3);
 
   code {
@@ -621,7 +744,7 @@ function forceHighEcc() {
     border-radius: 4px;
     background: var(--brand-soft);
     color: var(--brand);
-    font-size: 10.5px;
+    font-size: 10px;
   }
 }
 
@@ -658,9 +781,11 @@ function forceHighEcc() {
 }
 
 .logo-block {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--border-strong);
+  margin-top: 10px;
+  padding: 10px 10px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
 }
 
 .logo-head {
@@ -673,7 +798,8 @@ function forceHighEcc() {
 .logo-title {
   font-size: 11px;
   font-weight: 700;
-  color: var(--ink-2);
+  letter-spacing: .3px;
+  color: var(--ink);
 }
 
 .logo-row {
@@ -691,7 +817,7 @@ function forceHighEcc() {
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: 9px;
-  background: var(--surface-soft);
+  background: var(--surface);
   font-size: 10px;
   color: var(--ink-3);
 
@@ -738,8 +864,8 @@ function forceHighEcc() {
 
   &.blocked {
     border-style: dashed;
-    background: #f7f8fc;
-    color: #ccd4e6;
+    background: var(--blocked-bg);
+    color: var(--ink-blocked);
     cursor: not-allowed;
   }
 }
@@ -760,16 +886,16 @@ function forceHighEcc() {
   width: 100%;
   margin-top: 9px;
   padding: 6px 8px;
-  border: 1px dashed #f0c67a;
+  border: 1px dashed var(--border-warn);
   border-radius: 7px;
-  background: #fff9ec;
-  color: #a16207;
+  background: var(--surface-warn);
+  color: var(--ink-warn);
   font-size: 10.5px;
   line-height: 1.5;
   text-align: left;
 
   &:hover {
-    background: #fff3d6;
+    background: var(--surface-warn-hover);
   }
 }
 

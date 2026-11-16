@@ -152,7 +152,7 @@ th, td {
   padding: 7px 10px;
   text-align: left;
   font-size: 11.5px;
-  border-bottom: 1px solid #f0f3fa;
+  border-bottom: 1px solid var(--border-row);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -173,9 +173,9 @@ tbody tr {
   cursor: pointer;
   transition: background .12s;
 
-  &:hover { background: #f8faff; }
-  &.active { background: #eef2ff; box-shadow: inset 3px 0 0 var(--brand); }
-  &.picked { background: #f3f6ff; }
+  &:hover { background: var(--row-hover); }
+  &.active { background: var(--row-active); box-shadow: inset 3px 0 0 var(--brand); }
+  &.picked { background: var(--row-picked); }
 }
 
 .col-check { width: 34px; padding-right: 0; }

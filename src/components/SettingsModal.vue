@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useStudio } from '@/composables/useStudio'
 import { askConfirm } from '@/composables/useConfirm'
 import { compareVersion, fetchUpdateInfo } from '@/utils/update'
+import {
+  ACCENTS, THEME_MODES, useAppearance,
+  type AccentKey, type ThemeMode
+} from '@/composables/useAppearance'
 
 const {
   settingsOpen, closeSettings,
@@ -10,13 +14,25 @@ const {
   busy, copy, openDataFolder, applyDataDir, useDefaultDataDir, notify
 } = useStudio()
 
-type TabKey = 'about' | 'storage' | 'product'
+const { appearance, resolvedTheme, systemDark, setMode, setAccent, setMotion, resetAppearance } = useAppearance()
+
+type TabKey = 'appearance' | 'storage' | 'about' | 'product'
 
 const tabs = [
+  { key: 'appearance' as TabKey, label: '外观', desc: '主题与配色' },
   { key: 'storage' as TabKey, label: '数据存储', desc: '目录与迁移' },
   { key: 'about' as TabKey, label: '软件版本', desc: '版本与环境' },
   { key: 'product' as TabKey, label: '关于', desc: '功能与隐私' }
 ]
+
+const currentAccent = computed(() => ACCENTS.find(item => item.key === appearance.value.accent) ?? ACCENTS[0])
+
+function chooseMode(mode: ThemeMode) { setMode(mode) }
+function chooseAccent(key: AccentKey) { setAccent(key) }
+
+function onMotionChange(event: Event) {
+  setMotion((event.target as HTMLInputElement).checked ? 'reduced' : 'full')
+}
 
 const features = [
   '五种关键词写法，ID 规则逐段可配',
@@ -161,7 +177,111 @@ function onMaskClick(e: MouseEvent) {
             </nav>
 
             <div class="panes">
-              <section v-if="activeTab === 'about'" class="pane">
+              <section v-if="activeTab === 'appearance'" class="pane">
+                <div class="pane-head">
+                  <span>主题模式</span>
+                  <span class="tag-current">{{ resolvedTheme === 'dark' ? '当前深色' : '当前浅色' }}</span>
+                </div>
+
+                <div class="mode-grid">
+                  <button
+                    v-for="mode in THEME_MODES"
+                    :key="mode.key"
+                    type="button"
+                    class="mode-card"
+                    :class="{ on: appearance.mode === mode.key }"
+                    :aria-pressed="appearance.mode === mode.key"
+                    @click="chooseMode(mode.key)"
+                  >
+                    <span class="mode-preview" :class="'pv-' + mode.key">
+                      <i class="pv-bar" /><i class="pv-side" /><i class="pv-block" />
+                    </span>
+                    <span class="mode-name">{{ mode.label }}</span>
+                    <span class="mode-desc">{{ mode.desc }}</span>
+                    <span v-if="appearance.mode === mode.key" class="mode-tick">✓</span>
+                  </button>
+                </div>
+
+                <p v-if="appearance.mode === 'system'" class="note">
+                  系统当前为{{ systemDark ? '深色' : '浅色' }}模式，切换系统主题时应用会自动跟随。
+                </p>
+
+                <div class="pane-head gap-head">
+                  <span>主题配色</span>
+                  <span class="tag-current">{{ currentAccent.label }}</span>
+                </div>
+
+                <div class="accent-grid">
+                  <button
+                    v-for="accent in ACCENTS"
+                    :key="accent.key"
+                    type="button"
+                    class="accent-card"
+                    :class="{ on: appearance.accent === accent.key }"
+                    :aria-pressed="appearance.accent === accent.key"
+                    @click="chooseAccent(accent.key)"
+                  >
+                    <span class="accent-dot" :style="{ background: accent.color }" />
+                    <span class="accent-text">
+                      <b>{{ accent.label }}</b>
+                      <small>{{ accent.desc }}</small>
+                    </span>
+                    <span v-if="appearance.accent === accent.key" class="accent-tick">✓</span>
+                  </button>
+                </div>
+
+                <label class="checkbox-row motion-row">
+                  <input
+                    type="checkbox"
+                    :checked="appearance.motion === 'reduced'"
+                    @change="onMotionChange"
+                  />
+                  减少界面动效（关闭过渡与动画）
+                </label>
+
+                <div class="pane-head gap-head">
+                  <span>实时预览</span>
+                  <span class="tag-current">切换后立即生效</span>
+                </div>
+
+                <div class="theme-preview">
+                  <div class="tp-bar">
+                    <span class="tp-logo" />
+                    <span class="tp-title">GIAN-QRID-STUDIO</span>
+                    <span class="tp-pill">本地已存 12 条</span>
+                  </div>
+                  <div class="tp-body">
+                    <div class="tp-side">
+                      <span class="tp-line w70" /><span class="tp-line w90" />
+                      <span class="tp-field" /><span class="tp-field" />
+                      <span class="tp-primary">生成 ID</span>
+                    </div>
+                    <div class="tp-main">
+                      <div class="tp-card">
+                        <span class="tp-qr">▦</span>
+                        <div class="tp-card-lines">
+                          <span class="tp-line w60" /><span class="tp-line w85" />
+                        </div>
+                      </div>
+                      <div class="tp-table">
+                        <span v-for="n in 3" :key="n" class="tp-row" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="actions appearance-actions">
+                  <button class="btn btn-sm" @click="resetAppearance">恢复默认外观</button>
+                  <span class="saved-hint">自动保存在本机，重启后仍保留</span>
+                </div>
+
+                <p class="note">
+                  外观只影响界面显示，不改变二维码颜色、已生成的 ID 或导出文件内容。
+                  「跟随系统」读取 Windows 深色模式设置。
+                </p>
+              </section>
+
+              <section v-else-if="activeTab === 'about'" class="pane">
                 <div class="ver-block">
                   <span class="ver mono">v{{ appVersion }}</span>
                   <span class="ver-tag">{{ isBrowserMode ? '浏览器预览模式' : '桌面客户端' }}</span>
@@ -291,11 +411,13 @@ function onMaskClick(e: MouseEvent) {
           </div>
 
           <footer class="foot">
-            <span>{{ activeTab === 'storage'
-              ? '修改目录后立即生效，无需重启'
-              : activeTab === 'about'
-                ? '版本信息读取自应用清单'
-                : '数据全部保存在本地，不上传云端' }}</span>
+            <span>{{ activeTab === 'appearance'
+              ? '外观设置即时生效，自动保存在本机'
+              : activeTab === 'storage'
+                ? '修改目录后立即生效，无需重启'
+                : activeTab === 'about'
+                  ? '版本信息读取自应用清单'
+                  : '数据全部保存在本地，不上传云端' }}</span>
             <!-- <button class="btn btn-sm" @click="closeSettings">完成</button> -->
           </footer>
         </div>
@@ -312,7 +434,7 @@ function onMaskClick(e: MouseEvent) {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(17, 24, 45, .42);
+  background: var(--mask);
   backdrop-filter: blur(2px);
 }
 
@@ -325,7 +447,7 @@ function onMaskClick(e: MouseEvent) {
   overflow: hidden;
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 24px 64px rgba(17, 24, 45, .3);
+  box-shadow: var(--dialog-shadow);
 }
 
 .head {
@@ -376,14 +498,14 @@ function onMaskClick(e: MouseEvent) {
   .tab-title { font-size: 12px; font-weight: 600; color: var(--ink-2); }
   .tab-desc { font-size: 10px; color: var(--ink-3); }
 
-  &:hover { background: rgba(255, 255, 255, .75); }
+  &:hover { background: var(--tab-hover); }
 
   &.on {
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(27, 37, 89, .12);
+    background: var(--surface-raised);
+    box-shadow: var(--shadow-raised);
 
     .tab-title { color: var(--brand); font-weight: 700; }
-    .tab-desc { color: #9298c2; }
+    .tab-desc { color: var(--tab-desc-on); }
   }
 }
 
@@ -394,21 +516,21 @@ function onMaskClick(e: MouseEvent) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #f59e0b;
+  background: var(--warn);
 }
 
 .panes {
   min-width: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #ccd4e6 transparent;
+  scrollbar-color: var(--scrollbar-soft) transparent;
 
   &::-webkit-scrollbar { width: 8px; }
   &::-webkit-scrollbar-thumb {
     border-radius: 3px;
-    background: #ccd4e6;
+    background: var(--scrollbar-soft);
 
-    &:hover { background: #bcc5dd; }
+    &:hover { background: var(--scrollbar-hover); }
   }
   &::-webkit-scrollbar-track { background: transparent; }
 }
@@ -503,8 +625,8 @@ function onMaskClick(e: MouseEvent) {
   width: 38px;
   height: 38px;
   border-radius: 11px;
-  background: linear-gradient(135deg, #5b52f0, #2f6bff);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, .26);
+  background: var(--brand-gradient);
+  box-shadow: 0 6px 16px var(--brand-shadow);
 }
 
 .brand-info {
@@ -567,7 +689,7 @@ function onMaskClick(e: MouseEvent) {
   code {
     padding: 1px 5px;
     border-radius: 4px;
-    background: #f1f4fb;
+    background: var(--surface-code);
     font-size: 10.5px;
     color: var(--ink-2);
   }
@@ -606,8 +728,8 @@ function onMaskClick(e: MouseEvent) {
 .tag-custom {
   padding: 1px 7px;
   border-radius: 20px;
-  background: #fff4e5;
-  color: #b45309;
+  background: var(--tag-warn-bg);
+  color: var(--tag-warn-ink);
   font-size: 10px;
   font-weight: 700;
 }
@@ -642,7 +764,7 @@ function onMaskClick(e: MouseEvent) {
   code {
     padding: 1px 4px;
     border-radius: 4px;
-    background: #f1f4fb;
+    background: var(--surface-code);
     font-size: 10px;
   }
 
@@ -674,6 +796,195 @@ function onMaskClick(e: MouseEvent) {
 
   span { font-size: 10.5px; color: var(--ink-3); }
 }
+
+/* ---- 外观页 ---- */
+.tag-current {
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.gap-head { margin-top: 16px; }
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mode-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 8px 9px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: left;
+  transition: all .15s;
+
+  &:hover { border-color: var(--brand); }
+  &.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 2px var(--brand-ring); }
+}
+
+/* 预览缩略图用固定色，是为了如实展示浅/深主题本身，不随当前主题变化 */
+.mode-preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 42px;
+  margin-bottom: 5px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--pv-bg);
+
+  .pv-bar { position: absolute; top: 0; left: 0; right: 0; height: 9px; background: var(--pv-bar); }
+  .pv-side { position: absolute; top: 12px; left: 5px; bottom: 5px; width: 26%; border-radius: 2px; background: var(--pv-surface); }
+  .pv-block {
+    position: absolute; top: 12px; left: 35%; right: 5px; bottom: 5px;
+    border-radius: 2px; background: var(--pv-surface);
+    box-shadow: inset 0 3px 0 var(--pv-accent);
+  }
+}
+
+.pv-light { --pv-bg: #f3f6fc; --pv-bar: #e4e9f3; --pv-surface: #ffffff; --pv-accent: #4f46e5; }
+.pv-dark { --pv-bg: #0b1120; --pv-bar: #28334c; --pv-surface: #151d30; --pv-accent: #818cf8; }
+.pv-system {
+  --pv-bg: linear-gradient(90deg, #f3f6fc 0 50%, #0b1120 50% 100%);
+  --pv-bar: #d3dbeb; --pv-surface: #ffffff; --pv-accent: #4f46e5;
+}
+
+.mode-name { font-size: 11px; font-weight: 700; color: var(--ink); }
+.mode-desc { font-size: 9.5px; color: var(--ink-3); }
+.mode-tick { position: absolute; top: 5px; right: 7px; font-size: 11px; font-weight: 700; color: var(--brand); }
+
+.accent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.accent-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  background: var(--surface);
+  text-align: left;
+  transition: all .15s;
+
+  &:hover { border-color: var(--brand); }
+  &.on { border-color: var(--brand); background: var(--brand-soft); }
+}
+
+.accent-dot {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+}
+
+.accent-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  b { font-size: 11px; font-weight: 700; color: var(--ink); }
+  small { font-size: 9.5px; color: var(--ink-3); }
+}
+
+.accent-tick { position: absolute; top: 2px; right: 6px; font-size: 10px; font-weight: 700; color: var(--brand); }
+
+.motion-row { margin: 12px 0 0; font-size: 11.5px; }
+
+.theme-preview {
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.tp-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.tp-logo { width: 12px; height: 12px; border-radius: 3px; background: var(--brand-gradient); }
+.tp-title { font-size: 9px; font-weight: 700; color: var(--ink); }
+.tp-pill {
+  margin-left: auto;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-soft);
+  font-size: 8px;
+  color: var(--ink-2);
+}
+
+.tp-body { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 6px; padding: 7px; }
+.tp-side, .tp-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.tp-line { display: block; height: 5px; border-radius: 3px; background: var(--border-strong); opacity: .7; }
+.w60 { width: 60%; }
+.w70 { width: 70%; }
+.w85 { width: 85%; }
+.w90 { width: 90%; }
+
+.tp-field { height: 14px; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--surface); }
+.tp-primary { height: 16px; border-radius: 4px; background: var(--brand-gradient);font-size: 10px; padding: 0 4px; color: var(--on-brand);}
+
+.tp-card {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.tp-qr {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-checker);
+  color: var(--brand);
+  font-size: 16px;
+}
+
+.tp-card-lines { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+
+.tp-table {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.tp-row { height: 5px; border-bottom: 1px solid var(--border-row); }
+
+.appearance-actions { margin-top: 12px; align-items: center; }
+.saved-hint { font-size: 10px; color: var(--ink-3); }
 
 .modal-enter-active, .modal-leave-active { transition: opacity .18s ease; }
 .modal-enter-active .dialog, .modal-leave-active .dialog { transition: transform .18s ease; }

@@ -81,7 +81,7 @@ const percent = computed(() => {
 
 .bar {
   height: 100%;
-  background: linear-gradient(90deg, #5b52f0, #2f6bff);
+  background: var(--brand-gradient);
   transition: width .18s ease;
 }
 </style>

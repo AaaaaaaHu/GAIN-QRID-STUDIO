@@ -72,6 +72,7 @@ export function buildId(rule: IdRule, slug: string, sequence: number, date = new
   const parts: string[] = []
 
   if (sanitizeSegment(rule.prefix)) parts.push(sanitizeSegment(rule.prefix))
+  if (sanitizeSegment(rule.cityCode || '')) parts.push(sanitizeSegment(rule.cityCode || ''))
   if (slug) parts.push(slug)
   if (rule.includeDate) parts.push(formatDate(date, rule.dateFormat))
   if (rule.sequenceLength > 0) parts.push(String(sequence).padStart(rule.sequenceLength, '0'))
@@ -120,10 +121,19 @@ export function parseKeywords(input: string): string[] {
   return [...new Set(list)]
 }
 
-/** 渲染二维码内容模板：{id} {keyword} {slug} {date} {time} {sequence} {prefix} */
+/** 渲染二维码内容模板：{id} {keyword} {slug} {city} {date} {time} {sequence} {prefix} */
 export function renderQrContent(
   template: string,
-  ctx: { id: string; keyword: string; slug: string; sequence: number; date: Date; prefix: string }
+  ctx: {
+    id: string
+    keyword: string
+    slug: string
+    /** 城市编码，可省略 */
+    city?: string
+    sequence: number
+    date: Date
+    prefix: string
+  }
 ): string {
   const pad = (n: number) => String(n).padStart(2, '0')
   const d = ctx.date
@@ -131,6 +141,7 @@ export function renderQrContent(
     id: ctx.id,
     keyword: ctx.keyword,
     slug: ctx.slug,
+    city: ctx.city ?? '',
     sequence: String(ctx.sequence),
     prefix: ctx.prefix,
     date: `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`,

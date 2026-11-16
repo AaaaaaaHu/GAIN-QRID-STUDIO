@@ -2,7 +2,7 @@ import { computed, ref, watch } from 'vue'
 import { DEFAULT_CONFIG } from '@/types'
 import type { AppConfig, IdRecord } from '@/types'
 import {
-  generateUniqueId, keywordSlug, parseKeywords, previewId, renderQrContent
+  generateUniqueId, keywordSlug, parseKeywords, renderQrContent
 } from '@/utils/id'
 import { exportBundle, exportPng, exportText, type BundleProgress } from '@/utils/exporter'
 import { makeQrDataUrl } from '@/utils/qrcode'
@@ -74,10 +74,6 @@ const exportRecords = computed<IdRecord[]>(() => {
   }
   if (exportScope.value === 'current') return activeRecord.value ? [activeRecord.value] : []
   return records.value
-})
-const idSample = computed(() => {
-  const first = parseKeywords('示例产品')[0] ?? ''
-  return previewId(config.value.id, keywordSlug(first, config.value.id), nextSequence.value)
 })
 
 function notify(text: string, kind: 'ok' | 'warn' | 'err' = 'ok') {
@@ -206,6 +202,7 @@ async function generate(
         id: result.id,
         keyword: item.keyword,
         slug,
+        city: config.value.id.cityCode,
         sequence: result.sequence,
         date: now,
         prefix: config.value.id.prefix
@@ -355,7 +352,7 @@ export function useStudio() {
     config, records, activeId, activeRecord, selectedIds, search, exportScope,
     storagePath, dataDir, dataDirCustom, dataDirOk, isBrowserMode, appVersion, appIdentifier, usedCount,
     settingsOpen, openSettings, closeSettings,
-    qrDataUrl, busy, progress, toast, idSample, nextSequence,
+    qrDataUrl, busy, progress, toast, nextSequence,
     filteredRecords, exportRecords,
     init, generate, removeRecord, clearRecords, resetConfig,
     toggleSelect, selectAllFiltered, clearSelection, copy,
