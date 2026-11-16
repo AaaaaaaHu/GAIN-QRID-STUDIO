@@ -21,8 +21,8 @@ type TabKey = 'appearance' | 'storage' | 'about' | 'product'
 const tabs = [
   { key: 'appearance' as TabKey, label: '外观', desc: '主题与配色' },
   { key: 'storage' as TabKey, label: '数据存储', desc: '目录与迁移' },
-  { key: 'about' as TabKey, label: '软件版本', desc: '版本与环境' },
-  { key: 'product' as TabKey, label: '关于', desc: '功能与隐私' }
+  { key: 'about' as TabKey, label: '软件版本', desc: '版本与更新' },
+  { key: 'product' as TabKey, label: '关于', desc: '功能与数据' }
 ]
 
 const currentAccent = computed(() => ACCENTS.find(item => item.key === appearance.value.accent) ?? ACCENTS[0])
@@ -35,9 +35,11 @@ function onMotionChange(event: Event) {
 }
 
 const features = [
-  '五种关键词写法，ID 规则逐段可配',
+  '四种关键词写法，ID 规则逐段可配',
+  '城市编码可选，省 / 市 / 区县三级',
   '全局去重库，删除记录也不复用旧 ID',
   '二维码可嵌 Logo，五个安全位置可选',
+  '深浅主题 + 六套强调色，可跟随系统',
   '导出 CSV / JSON / TXT / PNG / ZIP 打包',
   '数据目录可改，支持迁移与清理'
 ]
@@ -59,7 +61,7 @@ async function checkUpdate() {
   try {
     const info = await fetchUpdateInfo()
     if (!info) {
-      updateMsg.value = '当前为本地构建版本，未配置更新通道'
+      updateMsg.value = '当前为本地构建版本，未接入在线更新'
       updateKind.value = 'warn'
       return
     }
@@ -286,7 +288,19 @@ function onMaskClick(e: MouseEvent) {
                   <span class="ver mono">v{{ appVersion }}</span>
                   <span class="ver-tag">{{ isBrowserMode ? '浏览器预览模式' : '桌面客户端' }}</span>
                 </div>
-                <p class="about-text">本地构建版本。配置更新通道后可在此比对线上最新版本。</p>
+
+                <div class="ver-stats">
+                  <div>
+                    <span>本地记录</span>
+                    <b>{{ records.length }}</b>
+                  </div>
+                  <div>
+                    <span>去重库累计</span>
+                    <b>{{ usedCount }}</b>
+                  </div>
+                </div>
+
+                <p class="about-text">本地构建版本，离线可用。当前未接入在线更新，需要新版本时请到 GitHub 的 Releases 页面下载安装包。</p>
 
                 <div class="update-row">
                   <button class="btn btn-sm" :disabled="checking" @click="checkUpdate">
@@ -329,7 +343,13 @@ function onMaskClick(e: MouseEvent) {
                   <h5>数据与隐私</h5>
                   <p>不联网、不上传、无账号。ID、二维码与规则配置只写入你指定的目录，退出或卸载都不会删除这些文件。</p>
                 </div>
- 
+
+                <div class="about-block">
+                  <h5>技术栈与数据</h5>
+                  <p>Tauri 2 · Vue 3 · TypeScript · Vite，二维码由 qrcode 生成，拼音索引由 pinyin-pro 生成。</p>
+                  <p>行政区划取自 modood/Administrative-divisions-of-China（MIT 许可），按 GB/T 2260 补齐为六位代码，共 3350 条，内置在安装包内，无需联网查询。</p>
+                </div>
+
                 <div class="about-block">
                   <h5>版权与联系</h5>
                   <p>版权所有 © 2026 GIAN</p>
@@ -521,7 +541,10 @@ function onMaskClick(e: MouseEvent) {
 
 .panes {
   min-width: 0;
+  /* grid 子项默认 min-height:auto，内容高于 .body 时会被裁掉且不出现滚动条 */
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-soft) transparent;
 
@@ -567,6 +590,34 @@ function onMaskClick(e: MouseEvent) {
   display: flex;
   align-items: baseline;
   gap: 9px;
+}
+
+.ver-stats {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+
+  > div {
+    flex: 1;
+    padding: 9px 11px;
+    border: 1px solid var(--card-border);
+    border-radius: 9px;
+    background: var(--card-bg);
+  }
+
+  span {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+
+  b {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .ver-tag {

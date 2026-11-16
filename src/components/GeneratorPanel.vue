@@ -229,73 +229,88 @@ function forceHighEcc() {
     </div>
 
     <div class="panel-body">
-      <div class="field">
-        <label for="kw">关键词<span class="sub">每行一个，也支持逗号 / 顿号分隔</span></label>
-        <textarea id="kw" v-model="keywordsText" class="textarea" rows="3" placeholder="例如：春季新品&#10;设备A-001&#10;张三" />
-        <div class="kw-meta">
-          <span>{{ keywords.length ? `识别到 ${keywords.length} 个关键词` : '留空则生成不带关键词的 ID' }}</span>
-          <span>共 <b>{{ totalToCreate }}</b> 个</span>
+      <section class="sub-card">
+        <div class="sub-head">
+          <h3>生成任务</h3>
+          <p>留空关键词则不写该段</p>
         </div>
-      </div>
 
-      <div class="field">
-        <label>创建数量</label>
-        <div class="seg">
-          <button type="button" :class="{ on: countMode === 'total' }" @click="countMode = 'total'">总数量</button>
-          <button type="button" :class="{ on: countMode === 'per' }" @click="countMode = 'per'">每个关键词</button>
-        </div>
-        <div class="count-row">
-          <input v-model.number="count" class="input count-input" type="number" min="1" :max="maxCount"
-            aria-label="创建数量" />
-          <div class="presets">
-            <button v-for="p in presets" :key="p" type="button" class="preset" :class="{ on: safeCount === p }"
-              @click="count = p">{{ p }}</button>
+        <div class="stack">
+          <div class="field">
+            <label for="kw">关键词<span class="sub">每行一个，也支持逗号 / 顿号分隔</span></label>
+            <textarea id="kw" v-model="keywordsText" class="textarea" rows="3" placeholder="例如：春季新品&#10;设备A-001&#10;张三" />
+            <div class="kw-meta">
+              <span>{{ keywords.length ? `识别到 ${keywords.length} 个关键词` : '留空则生成不带关键词的 ID' }}</span>
+              <span>共 <b>{{ totalToCreate }}</b> 个</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>创建数量</label>
+            <div class="seg">
+              <button type="button" :class="{ on: countMode === 'total' }" @click="countMode = 'total'">总数量</button>
+              <button type="button" :class="{ on: countMode === 'per' }" @click="countMode = 'per'">每个关键词</button>
+            </div>
+            <div class="count-row">
+              <input v-model.number="count" class="input count-input" type="number" min="1" :max="maxCount"
+                aria-label="创建数量" />
+              <div class="presets">
+                <button v-for="p in presets" :key="p" type="button" class="preset" :class="{ on: safeCount === p }"
+                  @click="count = p">{{ p }}</button>
+              </div>
+            </div>
+            <div v-if="planHint" class="plan-hint">{{ planHint }}</div>
+          </div>
+
+          <div class="field">
+            <label for="note">备注（可选）</label>
+            <input id="note" v-model="note" class="input" type="text" placeholder="批次 / 用途" />
           </div>
         </div>
-        <div v-if="planHint" class="plan-hint">{{ planHint }}</div>
-      </div>
-
-      <div class="field">
-        <label for="note">备注（可选）</label>
-        <input id="note" v-model="note" class="input" type="text" placeholder="批次 / 用途" />
-      </div>
+      </section>
 
       <details class="group" open>
         <summary>ID 组成规则</summary>
 
-        <div class="rule-stack">
-          <div class="grid-2">
-            <div class="field">
-              <label for="prefix">固定前缀</label>
-              <input id="prefix" v-model="config.id.prefix" class="input" type="text" placeholder="ID" />
-            </div>
-            <div class="field">
-              <label for="suffix">固定后缀</label>
-              <input id="suffix" v-model="config.id.suffix" class="input" type="text" placeholder="可留空" />
+        <div class="stack">
+          <section class="sub-card">
+            <div class="sub-head">
+              <h3>基础信息</h3>
+              <p>两端固定，城市按需插入</p>
             </div>
 
-            <div class="field span-2">
-              <label for="city">城市编码
-                <span class="sub">悬停省 / 市可向右展开下一级，也可直接搜索名称、代码、拼音；留空则不写入，位于固定前缀之后</span>
-              </label>
-              <div class="city-row">
-                <input id="city" class="input mono" type="text" maxlength="8" placeholder="可留空，如 310000"
-                  :value="config.id.cityCode" @input="onCityInput" />
-                <AppSelect class="city-picker" size="md" searchable cascade :column-width="164"
-                  search-placeholder="搜索城市 / 区县"
-                  :result-limit="400" :panel-width="304"
-                  empty-text="没有匹配项，可直接输入代码"
-                  :model-value="config.id.cityCode" :options="cityOptions"
-                  :placeholder="config.id.cityCode || '选择城市'" @update:model-value="applyCityCode" />
+            <div class="grid-2">
+              <div class="field">
+                <label for="prefix">固定前缀</label>
+                <input id="prefix" v-model="config.id.prefix" class="input" type="text" placeholder="ID" />
+              </div>
+              <div class="field">
+                <label for="suffix">固定后缀</label>
+                <input id="suffix" v-model="config.id.suffix" class="input" type="text" placeholder="可留空" />
+              </div>
+
+              <div class="field span-2">
+                <label for="city">城市编码
+                  <span class="sub">悬停逐级展开，或搜索名称 / 代码 / 拼音；留空则不写入</span>
+                </label>
+                <div class="city-row">
+                  <input id="city" class="input mono" type="text" maxlength="8" placeholder="可留空，如 310000"
+                    :value="config.id.cityCode" @input="onCityInput" />
+                  <AppSelect class="city-picker" size="md" searchable cascade :column-width="164"
+                    search-placeholder="搜索城市 / 区县"
+                    :result-limit="400" :panel-width="304"
+                    empty-text="没有匹配项，可直接输入代码"
+                    :model-value="config.id.cityCode" :options="cityOptions"
+                    :placeholder="config.id.cityCode || '选择城市'" @update:model-value="applyCityCode" />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          <!-- 关键词段字段多且自成一套规则，单独收成子模块，避免与其它字段混在一起 -->
-          <div class="sub-card">
+          <section class="sub-card">
             <div class="sub-head">
               <h3>关键词段</h3>
-              <p>关键词怎么写入、段与段之间用什么连接</p>
+              <p>怎么写入、段间怎么连接</p>
             </div>
 
             <div class="grid-2">
@@ -321,131 +336,152 @@ function forceHighEcc() {
                 </label>
               </div>
             </div>
-          </div>
+          </section>
 
-          <div class="grid-2">
-            <div class="field span-2">
-              <label class="checkbox-row">
-                <input v-model="config.id.includeDate" type="checkbox" />
-                写入日期
-              </label>
-              <AppSelect v-model="config.id.dateFormat" :options="dateFormatOptions" :disabled="!config.id.includeDate" />
+          <section class="sub-card">
+            <div class="sub-head">
+              <h3>日期与序号</h3>
+              <p>时间、序号、随机位与校验位</p>
             </div>
 
-            <div class="field">
-              <label for="seqlen">序号位数</label>
-              <input id="seqlen" v-model.number="config.id.sequenceLength" class="input" type="number" min="0" max="10" />
-            </div>
-            <div class="field">
-              <label for="randlen">随机位长度</label>
-              <input id="randlen" v-model.number="config.id.randomLength" class="input" type="number" min="0" max="16" />
-            </div>
+            <div class="grid-2">
+              <div class="field span-2">
+                <label class="checkbox-row">
+                  <input v-model="config.id.includeDate" type="checkbox" />
+                  写入日期
+                </label>
+                <AppSelect v-model="config.id.dateFormat" :options="dateFormatOptions" :disabled="!config.id.includeDate" />
+              </div>
 
-            <div class="field span-2">
-              <label for="charset">随机字符集</label>
-              <AppSelect id="charset" v-model="config.id.charset" :options="charsetOptions" />
-            </div>
+              <div class="field">
+                <label for="seqlen">序号位数</label>
+                <input id="seqlen" v-model.number="config.id.sequenceLength" class="input" type="number" min="0" max="10" />
+              </div>
+              <div class="field">
+                <label for="randlen">随机位长度</label>
+                <input id="randlen" v-model.number="config.id.randomLength" class="input" type="number" min="0" max="16" />
+              </div>
 
-            <div class="field span-2">
-              <label class="checkbox-row">
-                <input v-model="config.id.checksum" type="checkbox" />
-                追加校验位
-              </label>
+              <div class="field span-2">
+                <label for="charset">随机字符集</label>
+                <AppSelect id="charset" v-model="config.id.charset" :options="charsetOptions" />
+              </div>
+
+              <div class="field span-2">
+                <label class="checkbox-row">
+                  <input v-model="config.id.checksum" type="checkbox" />
+                  追加校验位
+                </label>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </details>
 
       <details class="group">
         <summary>二维码设置</summary>
 
-        <div class="field">
-          <label for="tpl">二维码内容模板</label>
-          <input id="tpl" v-model="config.qr.contentTemplate" class="input mono" type="text" />
-          <div class="hint-line">
-            占位符：<code>{id}</code> <code>{keyword}</code> <code>{slug}</code> <code>{city}</code> <code>{date}</code> <code>{sequence}</code>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="field">
-            <label for="ecc">纠错等级</label>
-            <AppSelect id="ecc" v-model="config.qr.errorCorrectionLevel" :options="eccOptions" />
-          </div>
-          <div class="field">
-            <label for="qsize">图片尺寸 (px)</label>
-            <input id="qsize" v-model.number="config.qr.size" class="input" type="number" min="128" max="2048"
-              step="32" />
-          </div>
-          <div class="field">
-            <label for="qmargin">静区边距</label>
-            <input id="qmargin" v-model.number="config.qr.margin" class="input" type="number" min="0" max="10" />
-          </div>
-          <div class="field">
-            <label>配色</label>
-            <div class="colors">
-              <label class="color-chip" title="前景色">
-                <input v-model="config.qr.foreground" type="color" />
-                <span>码</span>
-              </label>
-              <label class="color-chip" title="背景色">
-                <input v-model="config.qr.background" type="color" />
-                <span>底</span>
-              </label>
+        <div class="stack">
+          <section class="sub-card">
+            <div class="sub-head">
+              <h3>二维码内容</h3>
+              <p>模板决定扫码看到的内容</p>
             </div>
-          </div>
-        </div>
 
-        <div class="logo-block">
-          <div class="logo-head">
-            <span class="logo-title">Logo</span>
-            <label class="checkbox-row">
-              <input v-model="config.qr.logo.enabled" type="checkbox" :disabled="!config.qr.logo.dataUrl" />
-              启用
-            </label>
-          </div>
+            <div class="stack">
+              <div class="field">
+                <label for="tpl">二维码内容模板</label>
+                <input id="tpl" v-model="config.qr.contentTemplate" class="input mono" type="text" />
+                <div class="hint-line">
+                  占位符：<code>{id}</code> <code>{keyword}</code> <code>{slug}</code> <code>{city}</code> <code>{date}</code> <code>{sequence}</code>
+                </div>
+              </div>
 
-          <div class="logo-row">
-            <div class="logo-thumb">
-              <img v-if="config.qr.logo.dataUrl" :src="config.qr.logo.dataUrl" alt="logo 预览" />
-              <span v-else>无图</span>
-            </div>
-            <div class="logo-actions">
-              <button class="btn btn-sm" :disabled="logoBusy" @click="pickLogo">
-                {{ config.qr.logo.dataUrl ? '更换图片' : '选择图片' }}
-              </button>
-              <button v-if="config.qr.logo.dataUrl" class="btn btn-sm btn-danger" @click="clearLogo">移除</button>
-            </div>
-          </div>
-
-          <template v-if="config.qr.logo.dataUrl">
-            <div class="field">
-              <label>位置<span class="sub">✕ 处被结构性图案占用，不可放置</span></label>
-              <div class="pos-grid">
-                <button v-for="slot in positionSlots" :key="slot.key" type="button" class="pos-cell"
-                  :class="{ on: config.qr.logo.position === slot.pos, blocked: slot.disabled }"
-                  :disabled="slot.disabled" :title="slot.title" @click="choosePosition(slot.pos)">{{ slot.disabled ? '✕'
-                    : slot.label }}</button>
+              <div class="grid-2">
+                <div class="field">
+                  <label for="ecc">纠错等级</label>
+                  <AppSelect id="ecc" v-model="config.qr.errorCorrectionLevel" :options="eccOptions" />
+                </div>
+                <div class="field">
+                  <label for="qsize">图片尺寸 (px)</label>
+                  <input id="qsize" v-model.number="config.qr.size" class="input" type="number" min="128" max="2048"
+                    step="32" />
+                </div>
+                <div class="field">
+                  <label for="qmargin">静区边距</label>
+                  <input id="qmargin" v-model.number="config.qr.margin" class="input" type="number" min="0" max="10" />
+                </div>
+                <div class="field">
+                  <label>配色</label>
+                  <div class="colors">
+                    <label class="color-chip" title="前景色">
+                      <input v-model="config.qr.foreground" type="color" />
+                      <span>码</span>
+                    </label>
+                    <label class="color-chip" title="背景色">
+                      <input v-model="config.qr.background" type="color" />
+                      <span>底</span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
+          </section>
 
-            <div class="field">
-              <label>Logo 大小 <b>{{ config.qr.logo.sizePercent }}%</b></label>
-              <input v-model.number="config.qr.logo.sizePercent" class="range" type="range" min="8" max="24" step="1" />
+          <section class="sub-card">
+            <div class="sub-head has-action">
+              <h3>Logo</h3>
+              <p>叠加在码中央</p>
+              <label class="checkbox-row sub-action">
+                <input v-model="config.qr.logo.enabled" type="checkbox" :disabled="!config.qr.logo.dataUrl" />
+                启用
+              </label>
             </div>
 
-            <div class="logo-toggles">
-              <label class="checkbox-row"><input v-model="config.qr.logo.circular" type="checkbox" />圆形裁切</label>
-              <label class="checkbox-row"><input v-model="config.qr.logo.padding" type="checkbox" />白色衬垫</label>
-            </div>
+            <div class="stack">
+              <div class="logo-row">
+                <div class="logo-thumb">
+                  <img v-if="config.qr.logo.dataUrl" :src="config.qr.logo.dataUrl" alt="logo 预览" />
+                  <span v-else>无图</span>
+                </div>
+                <div class="logo-actions">
+                  <button class="btn btn-sm" :disabled="logoBusy" @click="pickLogo">
+                    {{ config.qr.logo.dataUrl ? '更换图片' : '选择图片' }}
+                  </button>
+                  <button v-if="config.qr.logo.dataUrl" class="btn btn-sm btn-danger" @click="clearLogo">移除</button>
+                </div>
+              </div>
 
-            <button v-if="config.qr.errorCorrectionLevel !== 'H'" type="button" class="ecc-hint" @click="forceHighEcc">
-              当前纠错 {{ config.qr.errorCorrectionLevel }} 级，点此改为 H（30%）更保险
-            </button>
-          </template>
+              <template v-if="config.qr.logo.dataUrl">
+                <div class="field">
+                  <label>位置<span class="sub">✕ 处被结构性图案占用，不可放置</span></label>
+                  <div class="pos-grid">
+                    <button v-for="slot in positionSlots" :key="slot.key" type="button" class="pos-cell"
+                      :class="{ on: config.qr.logo.position === slot.pos, blocked: slot.disabled }"
+                      :disabled="slot.disabled" :title="slot.title" @click="choosePosition(slot.pos)">{{ slot.disabled ? '✕'
+                        : slot.label }}</button>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Logo 大小 <b>{{ config.qr.logo.sizePercent }}%</b></label>
+                  <input v-model.number="config.qr.logo.sizePercent" class="range" type="range" min="8" max="24" step="1" />
+                </div>
+
+                <div class="logo-toggles">
+                  <label class="checkbox-row"><input v-model="config.qr.logo.circular" type="checkbox" />圆形裁切</label>
+                  <label class="checkbox-row"><input v-model="config.qr.logo.padding" type="checkbox" />白色衬垫</label>
+                </div>
+
+                <button v-if="config.qr.errorCorrectionLevel !== 'H'" type="button" class="ecc-hint" @click="forceHighEcc">
+                  当前纠错 {{ config.qr.errorCorrectionLevel }} 级，点此改为 H（30%）更保险
+                </button>
+              </template>
+            </div>
+          </section>
+
+          <button class="btn btn-sm reset" @click="resetConfig">恢复默认规则</button>
         </div>
-
-        <button class="btn btn-sm reset" @click="resetConfig">恢复默认规则</button>
       </details>
     </div>
     <div class="sample">
@@ -532,18 +568,20 @@ function forceHighEcc() {
 }
 
 /* 组内纵向堆叠：普通字段网格与关键词子模块之间保持统一间距 */
-.rule-stack {
+/* 卡片内纵向堆叠，统一 10px 间距 */
+.stack {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* 模块内的子卡片：用淡底 + 描边圈出相关字段，标题比二级小、比字段标签重 */
+/* 模块卡片：淡底 + 描边圈出相关字段，标题比二级小、比字段标签重 */
 .sub-card {
   padding: 10px 10px 11px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--card-border);
   border-radius: 10px;
-  background: var(--surface-soft);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
 }
 
 .sub-head {
@@ -553,7 +591,7 @@ function forceHighEcc() {
   gap: 4px 8px;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--card-border);
 
   h3 {
     margin: 0;
@@ -569,6 +607,15 @@ function forceHighEcc() {
     line-height: 1.45;
     color: var(--ink-3);
   }
+}
+
+/* 卡片右上角的开关，如 Logo「启用」 */
+.sub-head .sub-action {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
 }
 
 /* 卡片内的下拉与输入框统一 32px 高，避免同一行两栏底部错位 */
@@ -776,30 +823,7 @@ function forceHighEcc() {
 }
 
 .reset {
-  margin-top: 12px;
   width: 100%;
-}
-
-.logo-block {
-  margin-top: 10px;
-  padding: 10px 10px 11px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-soft);
-}
-
-.logo-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 9px;
-}
-
-.logo-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .3px;
-  color: var(--ink);
 }
 
 .logo-row {

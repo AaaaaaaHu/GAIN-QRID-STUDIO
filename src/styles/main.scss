@@ -188,9 +188,6 @@ details.group {
   }
 
   &[open] > summary::after { transform: rotate(180deg); }
-
-  /* 组内字段与下方网格之间留出呼吸感，避免提示文字贴住下一行标签 */
-  > .field + .grid-2 { margin-top: 10px; }
 }
 
 .empty {

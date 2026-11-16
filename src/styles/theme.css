@@ -27,6 +27,11 @@
   --border-warn: #f0c67a;
   --border-info: #dfe4fb;
 
+  /* 分组卡片：浅色下靠边框区分，深色下靠底色 + 更亮的描边 */
+  --card-bg: #f8faff;
+  --card-border: #e4e9f3;
+  --card-shadow: 0 1px 2px rgba(27, 37, 89, .04);
+
   /* 文字颜色 */
   --ink: #1b2559;
   --ink-2: #4a5578;
@@ -119,6 +124,11 @@
   --border-row: #212b41;
   --border-warn: #6b5429;
   --border-info: #2c3a5e;
+
+  /* 深色下 --surface 与 --surface-soft 差得太小，卡片另给一组更亮的色 */
+  --card-bg: #1e2942;
+  --card-border: #35415f;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, .28);
 
   --ink: #e8edfb;
   --ink-2: #b6c2dc;
