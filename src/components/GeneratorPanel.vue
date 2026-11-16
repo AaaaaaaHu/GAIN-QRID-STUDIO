@@ -531,6 +531,8 @@ function forceHighEcc() {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* 供 details.group > summary 吸顶时抵消，见 main.scss */
+  --group-sticky-offset: 14px;
   padding: 14px 16px 18px;
   display: flex;
   flex-direction: column;

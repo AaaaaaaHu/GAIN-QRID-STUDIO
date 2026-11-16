@@ -345,12 +345,6 @@ function onMaskClick(e: MouseEvent) {
                 </div>
 
                 <div class="about-block">
-                  <h5>技术栈与数据</h5>
-                  <p>Tauri 2 · Vue 3 · TypeScript · Vite，二维码由 qrcode 生成，拼音索引由 pinyin-pro 生成。</p>
-                  <p>行政区划取自 modood/Administrative-divisions-of-China（MIT 许可），按 GB/T 2260 补齐为六位代码，共 3350 条，内置在安装包内，无需联网查询。</p>
-                </div>
-
-                <div class="about-block">
                   <h5>版权与联系</h5>
                   <p>版权所有 © 2026 GIAN</p>
                   <p class="contact-line">

@@ -151,14 +151,22 @@ details.group {
   margin-top: 17px;
 
   > summary {
+    /* 二级标题吸顶：滚动到本组内部时固定在面板顶部，直到本组结束。
+       offset 用于抵消滚动容器的 padding-top，否则内容会从标题上方漏出来 */
+    position: sticky;
+    top: calc(-1 * var(--group-sticky-offset, 0px));
+    z-index: 3;
     display: flex;
     align-items: center;
     gap: 7px;
     list-style: none;
     cursor: pointer;
-    padding-bottom: 9px;
+    padding: 6px 0 9px;
     margin-bottom: 13px;
     border-bottom: 1px solid var(--border-row);
+    /* 背景 + 与面板底色同色的硬阴影，盖住下方 13px 间隙，避免内容从标题底下露出 */
+    background: var(--surface);
+    box-shadow: 0 13px 0 var(--surface);
     font-size: 12.5px;
     font-weight: 700;
     letter-spacing: .35px;
