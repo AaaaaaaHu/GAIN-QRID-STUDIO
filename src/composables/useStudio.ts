@@ -44,7 +44,7 @@ const storagePath = ref('')
 const dataDir = ref('')
 const dataDirCustom = ref(false)
 const isBrowserMode = ref(false)
-const appVersion = ref('1.0.0')
+const appVersion = ref('1.1.0')
 const appIdentifier = ref('')
 const usedCount = ref(0)
 const dataDirOk = ref(true)
@@ -131,7 +131,7 @@ async function readVersion(): Promise<string> {
       return await getVersion()
     } catch { /* fall back to build-time version */ }
   }
-  return typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.0.0'
+  return typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.1.0'
 }
 
 async function init() {
